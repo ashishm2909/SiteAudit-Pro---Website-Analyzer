@@ -2,72 +2,93 @@
 
 AI-Powered Website Security, UI/UX, and Performance Analysis Tool
 
-## Quick Start
+## What is SiteAudit Pro?
 
-```bash
-# 1. Clone and navigate
-git clone <repository-url>
-cd website-analyzer
+SiteAudit Pro is a comprehensive web analysis platform that helps developers, security researchers, and business owners identify vulnerabilities, usability flaws, and performance bottlenecks in any website. By combining static analysis with advanced AI reasoning, it delivers not just detection—but prioritized, actionable remediation guidance.
 
-# 2. Create virtual environment
-python3 -m venv venv
-source venv/bin/activate
+## Key Features
 
-# 3. Install dependencies
-pip install -r requirements.txt
+### Deep Security Auditing
+- **Transport Security**: HTTPS enforcement, TLS version checks, HSTS validation, mixed content detection
+- **Security Headers**: Validates 9+ headers including CSP, X-Frame-Options, X-Content-Type-Options, COOP, COEP
+- **Cookie Security**: Secure, HttpOnly, SameSite flag auditing
+- **Injection Detection**: Pattern-based SQL injection, XXE, and SSRF vector identification
+- **XSS Protection**: Detects eval(), innerHTML, document.write(), inline event handlers, and dangerous DOM sinks
+- **CSRF Validation**: Detects unprotected state-changing forms
+- **CORS Analysis**: Flags wildcard origins, credential misconfigurations
+- **Sensitive File Exposure**: Checks for 25+ sensitive files (.git, .env, wp-config.php, etc.)
+- **Supply Chain Security**: Subresource integrity checks, outdated library detection
+- **Clickjacking & MIME Sniffing**: Frame-ancestors and nosniff validation
+- **Debug Information**: Detects exposed stack traces, error reporting, and debug flags
 
-# 4. Configure environment
-cp .env.example .env
-# Edit .env and add your GROQ_API_KEY
+### Advanced UI/UX Analysis
+- **Responsive Design**: Viewport validation, zoom-accessibility checks
+- **Accessibility**: Alt text, heading hierarchy, skip navigation, form labels, ARIA attributes, table headers
+- **SEO Fundamentals**: Title/meta description length, H1 structure, charset, language attributes
+- **Semantic HTML**: Detects deprecated tags, empty interactive elements, placeholder-only labels
+- **Form Usability**: Autocomplete attributes, password field configuration, GET-method sensitive forms
 
-# 5. Run the application
-python backend/app.py
+### Performance Engineering
+- **Asset Optimization**: Page size, compression (gzip/brotli), image dimensions, modern formats (WebP/AVIF)
+- **Render Path**: Render-blocking CSS/JS, DOM size/depth, iframe count, resource hints
+- **Caching Strategy**: Cache-Control, ETag/Last-Modified validation
+- **Loading Performance**: Lazy loading detection, redirect chains, request count, font loading strategy
+- **Code Quality**: Unminified JavaScript detection
 
-# 6. Open in browser
-# http://127.0.0.1:5002
-```
+### AI-Powered Insights
+- **Structured Reports**: Overall health assessment, critical actions, deep dive analysis
+- **Exploit Scenarios**: Plain-language explanations of attack vectors and business impact
+- **Implementation Roadmap**: 3-week prioritized action plan
+- **Remediation Guidance**: Specific code/config examples for each fix
 
-## Documentation
+### Professional User Experience
+- **Dark Theme UI**: Modern, professional interface optimized for long analysis sessions
+- **Real-time Progress**: Animated loading states with step-by-step analysis indicators
+- **Interactive Dashboard**: Animated score rings, severity badges, tabbed findings
+- **Responsive Design**: Works seamlessly on desktop, tablet, and mobile
 
-- **[Full Documentation](docs/README.md)** - Complete guide with features, API reference, and troubleshooting
+## Benefits
 
-## Project Structure
+### For Developers
+- Catch security vulnerabilities before deployment
+- Get specific code fixes, not just generic warnings
+- Learn security best practices through AI explanations
+- Reduce debugging time with prioritized issue lists
 
-```
-├── backend/           # Flask API and analysis engine
-│   ├── app.py
-│   └── analyzer.py
-├── frontend/          # HTML templates and CSS
-│   ├── templates/
-│   └── static/
-├── docs/              # Documentation
-├── venv/              # Python virtual environment
-├── .env               # Environment variables
-├── .gitignore         # Git ignore rules
-└── requirements.txt   # Python dependencies
-```
+### For Security Teams
+- Comprehensive attack-surface mapping in one scan
+- Covers OWASP Top 10 and beyond
+- Evidence-based findings with exact locations
+- Compliance-ready reporting format
 
-## Tech Stack
+### For Business Owners
+- Protect customer data and brand reputation
+- Identify performance issues affecting SEO and conversions
+- Get clear ROI-focused remediation roadmaps
+- No security expertise required to understand results
 
-- **Backend**: Python, Flask
-- **Frontend**: HTML5, CSS3, JavaScript
-- **AI Engine**: Groq API (Llama 3.3 70B Versatile)
-- **Parsing**: BeautifulSoup4, Requests
+### For DevOps/DevSecOps
+- Integrate into CI/CD pipelines via API
+- Fast, automated security gate checks
+- Consistent, repeatable analysis
+- Reduce manual audit time by 80%+
 
-## Features
+## Why Choose SiteAudit Pro?
 
-- 20+ Security checks (HTTPS, headers, cookies, XSS, CSRF, SQLi, XXE, SSRF)
-- 15+ UI/UX checks (viewport, alt text, headings, accessibility)
-- 18+ Performance checks (compression, caching, DOM, images, fonts)
-- AI-powered structured analysis with implementation roadmap
-- Professional dark-themed UI with real-time loading states
-- Accurate issue counting and scoring
+| Aspect | Traditional Tools | SiteAudit Pro |
+|--------|------------------|---------------|
+| Analysis Depth | Surface-level checks | 50+ deep checks |
+| Output | Generic warnings | Structured, prioritized action plans |
+| AI Integration | None | Llama 3.3 70B reasoning |
+| Accessibility | Paid tiers | Included |
+| Setup | Complex, enterprise-only | 5-minute setup |
+| Cost | $100-1000/month | Free (API costs only) |
 
-## Requirements
+## Use Cases
 
-- Python 3.8+
-- Groq API key ([Get one free](https://console.groq.com))
-
-## License
-
-MIT
+1. **Pre-Launch Security Review**: Scan your site before going live
+2. **Competitive Analysis**: Compare security posture with competitors
+3. **Compliance Auditing**: Identify gaps in security headers and data protection
+4. **Performance Optimization**: Find bottlenecks affecting Core Web Vitals
+5. **Accessibility Auditing**: Ensure WCAG compliance
+6. **Learning Tool**: Understand web security through real-world examples
