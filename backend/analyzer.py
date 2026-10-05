@@ -9,7 +9,8 @@ from groq import Groq
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 
 class WebsiteAnalyzer:
@@ -21,6 +22,7 @@ class WebsiteAnalyzer:
         self.session.headers.update({
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
         })
+        self.model = os.environ.get('GROQ_MODEL', 'openai/gpt-oss-20b')
         self.client = Groq(api_key=os.environ.get('GROQ_API_KEY'))
         
     def _fetch_page(self, url, timeout=10):
@@ -1219,7 +1221,7 @@ Week 3: [Medium/Low priority improvements]
 Keep language technical but understandable. Focus on exploit scenarios and business impact."""
 
             response = self.client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
+                model=self.model,
                 messages=[
                     {"role": "system", "content": "You are a senior web security engineer and performance consultant. Provide structured, actionable analysis with specific technical details. Never say you are an AI."},
                     {"role": "user", "content": prompt}

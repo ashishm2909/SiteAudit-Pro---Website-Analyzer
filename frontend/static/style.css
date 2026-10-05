@@ -455,6 +455,33 @@ input[type="text"]::placeholder {
     border: 1px solid var(--border-active);
 }
 
+.score-explanation {
+    color: var(--text-secondary);
+    max-width: 24rem;
+    line-height: 1.6;
+    font-size: 0.9rem;
+}
+
+.score-help {
+    width: 100%;
+    max-width: 24rem;
+    text-align: left;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    line-height: 1.6;
+}
+
+.score-help summary,
+.issue-technical summary {
+    color: var(--accent);
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.score-help p {
+    margin-top: 0.5rem;
+}
+
 .score-circle {
     position: relative;
     width: 160px;
@@ -615,6 +642,21 @@ input[type="text"]::placeholder {
     opacity: 0.5;
 }
 
+.ai-section > summary {
+    list-style: none;
+    cursor: pointer;
+}
+
+.ai-section > summary::-webkit-details-marker {
+    display: none;
+}
+
+.ai-section > summary h2::after {
+    content: ' (open for details)';
+    color: var(--text-muted);
+    font: 500 0.75rem var(--font-body);
+}
+
 .section-header {
     display: flex;
     align-items: center;
@@ -632,6 +674,13 @@ input[type="text"]::placeholder {
     align-items: center;
     gap: 0.75rem;
     letter-spacing: -0.01em;
+}
+
+.section-intro {
+    color: var(--text-muted);
+    margin-top: 0.4rem;
+    line-height: 1.5;
+    font-size: 0.9rem;
 }
 
 .ai-badge {
@@ -844,6 +893,20 @@ input[type="text"]::placeholder {
     font-size: 0.9375rem;
 }
 
+.issue-description strong {
+    color: var(--text-primary);
+}
+
+.issue-technical {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+
+.issue-technical p {
+    margin-top: 0.75rem;
+}
+
 .issue-fix {
     background: rgba(245, 158, 11, 0.08);
     padding: 0.875rem 1rem;
@@ -852,6 +915,7 @@ input[type="text"]::placeholder {
     font-size: 0.875rem;
     border: 1px solid rgba(245, 158, 11, 0.15);
     line-height: 1.6;
+    margin-bottom: 0;
 }
 
 .issue-fix strong {

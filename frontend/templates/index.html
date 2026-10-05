@@ -94,60 +94,60 @@
                                 </svg>
                                 <div class="score-text">
                                     <span id="overallScore" class="score-number">0</span>
-                                    <span class="score-label">Overall</span>
+                                    <span class="score-label">Overall score</span>
                                 </div>
                             </div>
                             <div id="severityBadge" class="severity-badge">-</div>
+                            <p class="score-explanation">A score is a rating, not a number of findings. More findings mean a lower score.</p>
+                            <details class="score-help">
+                                <summary>How are scores worked out?</summary>
+                                <p>Each safety finding takes away 10 points. Each page design or speed finding takes away 8 points. Scores cannot go below 0. The overall score is the average of the three section scores.</p>
+                            </details>
                         </div>
 
                         <div class="score-card">
                             <div class="score-icon">🔒</div>
                             <div class="score-info">
-                                <div class="score-value" id="securityScore">0</div>
-                                <div class="score-name">Security</div>
+                                <div class="score-value" id="securityScore">0/100</div>
+                                <div class="score-name">Safety score</div>
                             </div>
-                            <div id="securityCount" class="issue-count">0 issues</div>
+                            <div id="securityCount" class="issue-count">0 findings</div>
                         </div>
 
                         <div class="score-card">
                             <div class="score-icon">🎨</div>
                             <div class="score-info">
-                                <div class="score-value" id="uiScore">0</div>
-                                <div class="score-name">UI/UX</div>
+                                <div class="score-value" id="uiScore">0/100</div>
+                                <div class="score-name">Page design score</div>
                             </div>
-                            <div id="uiCount" class="issue-count">0 issues</div>
+                            <div id="uiCount" class="issue-count">0 findings</div>
                         </div>
 
                         <div class="score-card">
                             <div class="score-icon">⚡</div>
                             <div class="score-info">
-                                <div class="score-value" id="perfScore">0</div>
-                                <div class="score-name">Performance</div>
+                                <div class="score-value" id="perfScore">0/100</div>
+                                <div class="score-name">Speed score</div>
                             </div>
-                            <div id="perfCount" class="issue-count">0 issues</div>
+                            <div id="perfCount" class="issue-count">0 findings</div>
                         </div>
-                    </div>
-
-                    <div class="ai-section">
-                        <div class="section-header">
-                            <h2>AI Deep Analysis</h2>
-                            <span class="ai-badge">Llama 3.3 70B</span>
-                        </div>
-                        <div id="aiContent" class="ai-content"></div>
                     </div>
 
                     <div class="findings-section">
                         <div class="section-header">
-                            <h2>Detailed Findings</h2>
+                            <div>
+                                <h2>Things to improve</h2>
+                                <p id="findingsSummary" class="section-intro"></p>
+                            </div>
                             <div class="tabs">
                                 <button class="tab-btn active" data-tab="security">
-                                    Security <span id="securityTabCount" class="tab-count">0</span>
+                                    Safety <span id="securityTabCount" class="tab-count">0</span>
                                 </button>
                                 <button class="tab-btn" data-tab="ui">
-                                    UI/UX <span id="uiTabCount" class="tab-count">0</span>
+                                    Page design <span id="uiTabCount" class="tab-count">0</span>
                                 </button>
                                 <button class="tab-btn" data-tab="performance">
-                                    Performance <span id="perfTabCount" class="tab-count">0</span>
+                                    Speed <span id="perfTabCount" class="tab-count">0</span>
                                 </button>
                             </div>
                         </div>
@@ -162,6 +162,15 @@
                             <div id="performanceIssues"></div>
                         </div>
                     </div>
+
+                    <details class="ai-section">
+                        <summary class="section-header">
+                            <h2>Extra AI notes</h2>
+                            <span class="ai-badge">Optional</span>
+                        </summary>
+                        <p class="section-intro">These extra notes may use technical words. Start with the short explanations in the findings below.</p>
+                        <div id="aiContent" class="ai-content"></div>
+                    </details>
 
                     <div class="recommendations-section">
                         <div class="section-header">
@@ -255,23 +264,52 @@
         }
         
         function displayResults(data) {
+            const summary = data.summary || {};
+            const safeValue = (value, fallback = 0) => Number.isFinite(Number(value)) ? Number(value) : fallback;
+            const securityIssues = Array.isArray(data.security_issues) ? data.security_issues : [];
+            const uiIssues = Array.isArray(data.ui_issues) ? data.ui_issues : [];
+            const performanceIssues = Array.isArray(data.performance_issues) ? data.performance_issues : [];
+            const securityCount = securityIssues.length;
+            const uiCount = uiIssues.length;
+            const performanceCount = performanceIssues.length;
+            const totalFindings = securityCount + uiCount + performanceCount;
+            const scoreFor = (count, pointsPerFinding) => Math.max(0, 100 - count * pointsPerFinding);
+            const securityScore = scoreFor(securityCount, 10);
+            const uiScore = scoreFor(uiCount, 8);
+            const performanceScore = scoreFor(performanceCount, 8);
+            const overallScore = Math.round((securityScore + uiScore + performanceScore) / 3);
+
             document.getElementById('results').style.display = 'block';
             document.getElementById('analyzedUrl').textContent = data.url;
             document.getElementById('timestamp').textContent = new Date(data.analyzed_at).toLocaleString();
             
-            document.getElementById('securityCount').textContent = data.summary.security_count;
-            document.getElementById('uiCount').textContent = data.summary.ui_count;
-            document.getElementById('perfCount').textContent = data.summary.performance_count;
-            document.getElementById('securityTabCount').textContent = data.summary.security_count;
-            document.getElementById('uiTabCount').textContent = data.summary.ui_count;
-            document.getElementById('perfTabCount').textContent = data.summary.performance_count;
+            const setScore = (elementId, value, suffix = '/100') => {
+                const node = document.getElementById(elementId);
+                node.textContent = `${safeValue(value)}${suffix}`;
+            };
+
+            const setIssueCount = (elementId, value, label = 'findings') => {
+                const count = safeValue(value);
+                const node = document.getElementById(elementId);
+                node.textContent = `${count} ${label}`;
+            };
+
+            setIssueCount('securityCount', securityCount);
+            setIssueCount('uiCount', uiCount);
+            setIssueCount('perfCount', performanceCount);
+            document.getElementById('securityTabCount').textContent = securityCount;
+            document.getElementById('uiTabCount').textContent = uiCount;
+            document.getElementById('perfTabCount').textContent = performanceCount;
+            document.getElementById('findingsSummary').textContent = totalFindings
+                ? `We found ${totalFindings} ${totalFindings === 1 ? 'thing' : 'things'} to improve. The numbers on the tabs match the lists below.`
+                : 'Great news! We did not find anything to improve.';
             
-            animateScore('overallScore', data.summary.overall_score);
-            animateScore('securityScore', data.summary.security_score);
-            animateScore('uiScore', data.summary.ui_score);
-            animateScore('perfScore', data.summary.performance_score);
+            setScore('securityScore', securityScore);
+            setScore('uiScore', uiScore);
+            setScore('perfScore', performanceScore);
+            animateScore('overallScore', overallScore);
             
-            updateRing('overallRing', data.summary.overall_score);
+            updateRing('overallRing', overallScore);
             
             const severityBadge = document.getElementById('severityBadge');
             severityBadge.textContent = data.summary.severity;
@@ -289,19 +327,19 @@
             }
             
             const securityDiv = document.getElementById('securityIssues');
-            securityDiv.innerHTML = data.security_issues.length ? 
-                data.security_issues.map(issue => createIssueCard(issue)).join('') : 
-                '<div class="no-issues">✓ No security issues detected</div>';
+            securityDiv.innerHTML = securityIssues.length ?
+                securityIssues.map(issue => createIssueCard(issue, 'safety')).join('') :
+                '<div class="no-issues">Great job! No safety problems were found.</div>';
             
             const uiDiv = document.getElementById('uiIssues');
-            uiDiv.innerHTML = data.ui_issues.length ? 
-                data.ui_issues.map(issue => createIssueCard(issue)).join('') : 
-                '<div class="no-issues">✓ No UI/UX issues detected</div>';
+            uiDiv.innerHTML = uiIssues.length ?
+                uiIssues.map(issue => createIssueCard(issue, 'design')).join('') :
+                '<div class="no-issues">Great job! No page design problems were found.</div>';
             
             const perfDiv = document.getElementById('performanceIssues');
-            perfDiv.innerHTML = data.performance_issues.length ? 
-                data.performance_issues.map(issue => createIssueCard(issue)).join('') : 
-                '<div class="no-issues">✓ No performance issues detected</div>';
+            perfDiv.innerHTML = performanceIssues.length ?
+                performanceIssues.map(issue => createIssueCard(issue, 'speed')).join('') :
+                '<div class="no-issues">Great job! No speed problems were found.</div>';
             
             const recDiv = document.getElementById('recommendationsList');
             recDiv.innerHTML = data.recommendations.length ?
@@ -339,7 +377,7 @@
                 const progress = Math.min(elapsed / duration, 1);
                 const easeOut = 1 - Math.pow(1 - progress, 3);
                 const current = Math.round(start + (targetScore - start) * easeOut);
-                el.textContent = current;
+                el.textContent = `${current}/100`;
                 
                 if (progress < 1) {
                     requestAnimationFrame(update);
@@ -406,46 +444,74 @@
             return html;
         }
         
-        function createIssueCard(issue) {
-            const icons = {
-                'Transport Security': 'TS',
-                'Headers': 'HD',
-                'Cookie Security': 'CK',
-                'XSS': 'XS',
-                'CSRF': 'CR',
-                'Information Disclosure': 'ID',
-                'Open Redirect': 'RD',
-                'CORS': 'CO',
-                'Supply Chain': 'SC',
-                'Sensitive Files': 'SF',
-                'Form Security': 'FM',
-                'Clickjacking': 'CJ',
-                'MIME Sniffing': 'MN',
-                'Responsive': 'RP',
-                'Accessibility': 'A11Y',
-                'SEO': 'SEO',
-                'UI': 'UI',
-                'Links': 'LK',
-                'Maintainability': 'MT',
-                'Performance': 'PF'
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, character => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            })[character]);
+        }
+
+        function createIssueCard(issue, category) {
+            const simpleExplanations = {
+                'Transport Security': 'The website connection needs better protection while information travels between the site and its visitors.',
+                'Headers': 'The website is missing a browser safety rule. These rules help browsers protect people visiting the site.',
+                'Cookie Security': 'A small piece of information saved by the website needs better protection.',
+                'XSS': 'The page may run unsafe code. Someone could try to trick the site into running code they made.',
+                'CSRF': 'A form needs a check to make sure the person using it really meant to send it.',
+                'Information Disclosure': 'The website may be showing files or details that should stay private.',
+                'Open Redirect': 'A link may send visitors to a different website without making that clear.',
+                'CORS': 'The website may let other websites access information too freely.',
+                'Supply Chain': 'A tool loaded from another website needs a check to make sure it has not been changed.',
+                'Sensitive Files': 'A private file may be open for anyone to see.',
+                'Form Security': 'A form that handles private information needs safer settings.',
+                'Clickjacking': 'Another website may be able to hide this page inside its own page and trick visitors into clicking.',
+                'MIME Sniffing': 'The browser may guess the wrong kind of file, which can make unsafe content run.',
+                'Injection': 'The website may treat text from a visitor like instructions. That could let someone do something they should not.',
+                'SSRF': 'The website may be tricked into visiting other places on the internet for someone.',
+                'Responsive': 'The page may not fit or work well on phones and smaller screens.',
+                'Accessibility': 'Some people may have trouble seeing, reading, or using part of this page.',
+                'SEO': 'Search engines may have trouble understanding this page or showing it in search results.',
+                'UI': 'Part of the page may be confusing or difficult to use.',
+                'Links': 'A link on the page may not take visitors where they expect.',
+                'Maintainability': 'This part of the website may be harder to update or keep working.',
+                'Performance': 'This may make the website slower to load or use.'
             };
-            
-            const icon = icons[issue.type] || '!!';
-            
+            const importance = {
+                critical: 'Fix first',
+                high: 'Important',
+                medium: 'Worth fixing',
+                low: 'Small improvement'
+            };
+            const categoryLabels = {
+                safety: 'Safety',
+                design: 'Page design',
+                speed: 'Speed'
+            };
+            const requestedSeverity = String(issue.severity || 'low').toLowerCase();
+            const severity = Object.prototype.hasOwnProperty.call(importance, requestedSeverity) ? requestedSeverity : 'low';
+            const simpleText = simpleExplanations[issue.type] || `Something in the ${categoryLabels[category] || 'website'} could work better.`;
+            const title = escapeHtml(issue.title);
+            const technicalDescription = escapeHtml(issue.description);
+            const fix = escapeHtml(issue.fix);
+
             return `
-                <div class="issue-card severity-${issue.severity}">
+                <div class="issue-card severity-${severity}">
                     <div class="issue-header">
-                        <span class="severity-icon">${icon}</span>
                         <div class="issue-title-group">
-                            <span class="severity-badge ${issue.severity}">${issue.severity.toUpperCase()}</span>
-                            <h4>${issue.title}</h4>
+                            <span class="severity-badge ${severity}">${importance[severity] || 'Small improvement'}</span>
+                            <h4>${title}</h4>
                         </div>
-                        <span class="issue-type">${issue.type}</span>
+                        <span class="issue-type">${categoryLabels[category] || 'Finding'}</span>
                     </div>
-                    <p class="issue-description">${issue.description}</p>
-                    <div class="issue-fix">
-                        <strong>Fix:</strong> ${issue.fix}
-                    </div>
+                    <p class="issue-description"><strong>In simple words:</strong> ${simpleText}</p>
+                    <details class="issue-technical">
+                        <summary>Technical details and suggested fix</summary>
+                        <p>${technicalDescription}</p>
+                        <p class="issue-fix"><strong>For the website owner:</strong> ${fix}</p>
+                    </details>
                 </div>
             `;
         }
